@@ -1,5 +1,7 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, FormView
 from django.urls import reverse_lazy
+from .forms import ContatoForm
+from django.contrib import messages
 
 
 class IndexView(TemplateView):
@@ -24,12 +26,23 @@ class AboutView(TemplateView):
         return context
 
 
-class ContactView(TemplateView):
+class ContactView(FormView):
     template_name = 'home_page/contact.html'
     success_url = reverse_lazy('contact')
 
+    form_class = ContatoForm
+
     def get_context_data(self, **kwargs):
-        context = super(ContactView, self).get_context_data(*kwargs)
-        context['title'] = 'Página Contato'
-        context['content'] = 'Bem-vindo a página contato'
+        context = super(ContactView, self).get_context_data(**kwargs)
+        context['title'] = 'Contato'
+        context['content'] = 'Formulário de contato'
         return context
+
+    def form_valid(self, form, *args, **kwargs):
+        form.send_mail()
+        messages.success(self.request, 'E-mail enviado com sucesso')
+        return super(ContactView, self).form_valid(form, *args, **kwargs)
+
+    def form_invalid(self, form, *args, **kwargs):
+        messages.error(self.request, 'Erro ao enviar e-mail')
+        return super(ContactView, self).form_invalid(form, *args, **kwargs)
