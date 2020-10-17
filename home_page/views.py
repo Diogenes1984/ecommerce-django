@@ -36,6 +36,7 @@ class ContactView(FormView):
         context = super(ContactView, self).get_context_data(**kwargs)
         context['title'] = 'Contato'
         context['content'] = 'Formulário de contato'
+        context['obrigatorio'] = '* Campos obrigatórios'
         return context
 
     def form_valid(self, form, *args, **kwargs):
